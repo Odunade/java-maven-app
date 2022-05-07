@@ -1,38 +1,45 @@
-def gv
+Pipeline {
 
-pipeline {
-    agent any
+    any agent
+
     stages {
-        stage("init") {
-            steps {
-                script {
-                    gv = load "script.groovy"
+
+        stage("build")  {
+
+            steps   {
+                script{
+                    echo 'building the application...'
                 }
+
             }
+
         }
-        stage("build jar") {
-            steps {
-                script {
-                    echo "building jar"
-                    //gv.buildJar()
+
+        stage("test")   {
+
+            steps   {
+                script{
+                    echo  'testing the application...'
                 }
+                
+            
             }
+
         }
-        stage("build image") {
-            steps {
-                script {
-                    echo "building image"
-                    //gv.buildImage()
-                }
-            }
-        }
+        
         stage("deploy") {
-            steps {
-                script {
-                    echo "deploying"
-                    //gv.deployApp()
+
+            steps   {
+                script{
+                    def dockerCMD = 'docker run -p 3080:3080 -d odunade/my-app:2.0'
+                    sshagent(['docker']) {
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@52.55.188.212 ${dockerCMD}"
+                    }
+                
                 }
+                
+            
             }
         }
-    }   
+    }
 }
